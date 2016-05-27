@@ -8,7 +8,7 @@
 
 using namespace std;
 
-#define MAX_FEATURE_READ 1000
+#define MAX_FEATURE_READ 20000
 
 int main() {
 
@@ -79,7 +79,7 @@ int main() {
     printf("Feature Count: %d\n", feature_sd->size);
     printf("Feature Node Count: %d\n", feature_sd->nodeCount());
 
-    file_sd->print();
+//    file_sd->print();
 
     cout << endl;
 
@@ -88,14 +88,14 @@ int main() {
 //
 //    file_sd->sort(translation);
 //
-//    file_sd->print();
+    file_sd->print();
 
     cout << endl;
 
-    db->print();
+//    db->print();
     db->sort();
-    cout << endl;
-    db->print();
+//    cout << endl;
+//    db->print();
 
 
 //    file_sd->print();

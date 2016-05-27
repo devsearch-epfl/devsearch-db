@@ -8,8 +8,6 @@
 
 using namespace std;
 
-#define CHILDRENS_LENGTH 128
-
 StringDict::StringDict() {
     tempId = 0;
     size = 0;
@@ -26,7 +24,7 @@ int StringDict::add(string text) {
     trie_node *current = root;
 
     while(strPos < text.length()) {
-        int ordinal = charToAddress(text.at((unsigned long) strPos));
+        char ordinal = text.at((unsigned long) strPos);
 
         if (!current->children[ordinal]) {
 
@@ -55,7 +53,7 @@ int StringDict::getKey(string text) {
     trie_node* current = root;
 
     while(strPos < text.length()) {
-        int ordinal = charToAddress(text.at((unsigned long) strPos));
+        char ordinal = text.at((unsigned long) strPos);
 
         if (!current->children[ordinal]) {
             return -1;
@@ -73,16 +71,6 @@ int StringDict::generateKey() {
     return tempId++;
 }
 
-int StringDict::charToAddress(char &c) {
-    int ord = int(c);
-
-    if (ord>=CHILDRENS_LENGTH) {
-        ord = 0;
-    }
-
-    return ord;
-}
-
 void StringDict::print() {
     print("", root);
 }
@@ -92,16 +80,12 @@ void StringDict::print(string prefix, trie_node* node) {
         printf("%s[%d]\n", prefix.c_str(), node->key);
     }
 
-    for(int i = 0; i < CHILDRENS_LENGTH; i++) {
+    for (child_map::iterator it=node->children.begin(); it!=node->children.end(); ++it) {
 
+        string newPrefix = prefix;
+        newPrefix += it->first;
 
-        if (node->children[i]) {
-
-            string newPrefix = prefix;
-            newPrefix += i;
-
-            print(newPrefix, node->children[i]);
-        }
+        print(newPrefix, it->second);
     }
 }
 
@@ -112,15 +96,14 @@ int StringDict::nodeCount() {
 int StringDict::nodeCount(trie_node* node) {
     int count = 0;
 
-    for(int i = 0; i < CHILDRENS_LENGTH; i++) {
+    for (child_map::iterator it=node->children.begin(); it!=node->children.end(); ++it) {
 
-        if (node->children[i]) {
-
-            count += nodeCount(node->children[i]);
-        }
+        count += nodeCount(it->second);
     }
 
-    return count+1;
+    count+=node->children.size();
+
+    return count;
 }
 
 void StringDict::sort(int* translation) {
@@ -128,6 +111,7 @@ void StringDict::sort(int* translation) {
 }
 
 int StringDict::sort(int* translation, trie_node* node, int idStart) {
+
     if (node->key >= 0) {
 
         translation[node->key] = idStart;
@@ -136,12 +120,8 @@ int StringDict::sort(int* translation, trie_node* node, int idStart) {
         idStart++;
     }
 
-    for(int i = 0; i < CHILDRENS_LENGTH; i++) {
-
-        if (node->children[i]) {
-
-            idStart = sort(translation, node->children[i], idStart);
-        }
+    for (child_map::iterator it=node->children.begin(); it!=node->children.end(); ++it) {
+        idStart = sort(translation, it->second, idStart);
     }
 
     return idStart;

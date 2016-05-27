@@ -6,13 +6,16 @@
 #define DEVSEARCH_DB_STRINGDICT_H
 
 #include <string>
+#include <map>
 using namespace std;
 
-#define CHILDRENS_LENGTH 128
+struct trie_node;
+
+typedef std::map<char, trie_node*> child_map;
 
 struct trie_node {
     int key;
-    trie_node *children[CHILDRENS_LENGTH];
+    child_map children;
 };
 
 class StringDict {
@@ -29,8 +32,6 @@ public:
     int add(string text);
 
     int size;
-
-    int charToAddress(char &at);
 
     int getKey(string text);
 
