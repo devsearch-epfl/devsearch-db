@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include "FeatureStore.h"
+#include "FeatureIndex.h"
 
 FeatureStore::FeatureStore(int initSize) {
     maxSize = initSize;
@@ -10,22 +11,45 @@ FeatureStore::FeatureStore(int initSize) {
     db = new db_feature[initSize];
 
     HS_end = 0;
+    isSorted = false;
 }
 
 void FeatureStore::add(int feature, int file, float reporank, int line) {
     if (size < maxSize) {
         db[size] = {feature, file, line, reporank};
         size++;
+        isSorted = false;
     }
 }
 
 void FeatureStore::sort() {
     HS_sort();
+    isSorted = true;
 }
 
 void FeatureStore::print() {
     for (int i = 0; i < size; i++) {
         printf("%d\t%d\t%d\t%f\n", db[i].feature_id, db[i].file_id, db[i].line_nb, db[i].reporank);
+    }
+}
+
+
+void FeatureStore::buildFeatureIndex(FeatureIndex *index) {
+
+//    if data is not sorted yet, will have to do that first
+    if (!isSorted) {
+        sort();
+    }
+
+    int currentFID = -1;
+
+    for (int i = 0; i < size; i++) {
+
+        if (db[i].feature_id != currentFID) {
+
+            currentFID = db[i].feature_id;
+            index->build_addStart(currentFID, i);
+        }
     }
 }
 
@@ -107,11 +131,18 @@ void FeatureStore::HS_swap(int i, int j) {
     db[j] = temp;
 }
 
+// sort order is feature_id, file_id, line nb
 bool FeatureStore::HS_isBefore(int i, int j) {
     if(db[i].feature_id < db[j].feature_id) {
         return true;
     } else if (db[i].feature_id == db[j].feature_id) {
-        return db[i].file_id < db[j].file_id;
+        if(db[i].file_id < db[j].file_id) {
+            return true;
+        } else if (db[i].file_id == db[j].file_id) {
+            return db[i].line_nb < db[j].line_nb;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }

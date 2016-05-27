@@ -4,6 +4,7 @@
 #include "StringDict.h"
 #include "JsonImporter.h"
 #include "FeatureStore.h"
+#include "FeatureIndex.h"
 #include <regex>
 
 using namespace std;
@@ -12,46 +13,11 @@ using namespace std;
 
 int main() {
 
-//    ifstream jsonFile;
-//
-//    jsonFile.open("/Users/matt/git/devsearch-lookup/bucket1.json");
-//
-//    string line;
-//
-//    cout << " " << int('a')  << " " << int('z')  << " " << int('-')  << " " << int('A')  << " " << int('-') << endl;
-//
-//    getline(jsonFile, line);
-//
-//    cout << line;
-//
-//    StringDict* dict = new StringDict();
-//
-//    int a = dict->add("a");
-//    int aa = dict->add("aa");
-//    int aaa = dict->add("aaa");
-//
-//    int b = dict->add("b");
-//    int ba = dict->add("ba");
-//    int b_bis = dict->add("b");
-//
-//    int aaa_bis = dict->add("aaa");
-//
-//    printf("\n%d %d %d %d %d %d %d\n", a, aa, aaa, aaa_bis, b, ba, b_bis);
-//
-////    regex reg1("{\"feature\":\"([^\"]+)\",\"file\":\"([^\"]+)\",\"line\":{\"\\$numberInt\":\"(\\d+)\"},\"repoRank\":([\\d\\.]+)}");
-//    regex reg1("\\{\"feature\":\"([^\"]+)\",\"file\":\"([^\"]+)\",\"line\":\\{\"\\$numberInt\":\"(\\d+)\"\\},\"repoRank\":([\\d\\.]+)\\}");
-//    smatch match;
-//
-//    regex_search(line, match, reg1);
-//
-//    cout << " " << match.str(1)  << " " << match.str(2)  << " " << match.str(3)  << " " << match.str(4)  << " " << match.str(5) << endl;
-//
-//    cout << endl << endl << endl;
-
     JsonImporter ji("/Users/matt/git/devsearch-lookup/bucket1.json");
     StringDict* file_sd = new StringDict();
     StringDict* feature_sd = new StringDict();
     FeatureStore* db = new FeatureStore(MAX_FEATURE_READ);
+
 
     string feature, file;
     int lineNb = 0;
@@ -88,14 +54,25 @@ int main() {
 //
 //    file_sd->sort(translation);
 //
-    file_sd->print();
+//    file_sd->print();
 
     cout << endl;
 
 //    db->print();
     db->sort();
 //    cout << endl;
-//    db->print();
+    db->print();
+
+
+    FeatureIndex* db_index = new FeatureIndex(feature_sd->size, count);
+    db->buildFeatureIndex(db_index);
+
+    string query[] = {
+        "controlStatement=if",
+        "import=java.util.List",
+        "controlStatement=for"
+    };
+
 
 
 //    file_sd->print();

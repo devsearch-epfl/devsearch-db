@@ -6,6 +6,8 @@
 #define DEVSEARCH_DB_FEATURESTORE_H
 
 
+#include "FeatureIndex.h"
+
 struct db_feature {
     int file_id;
     int feature_id;
@@ -19,6 +21,7 @@ private:
     db_feature* db;
     int maxSize;
     int HS_end;
+    bool isSorted;
 public:
     int size;
     FeatureStore(int InitSize);
@@ -46,6 +49,8 @@ public:
     bool HS_isBefore(int i, int j);
 
     void print();
+
+    void buildFeatureIndex(FeatureIndex *index);
 };
 
 
