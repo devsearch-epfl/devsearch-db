@@ -53,6 +53,10 @@ void FeatureStore::buildFeatureIndex(FeatureIndex *index) {
     }
 }
 
+db_feature *FeatureStore::at(int pos) {
+    return &db[pos];
+}
+
 
 /*
  * Parts relative to heap sorting
@@ -120,8 +124,8 @@ void FeatureStore::HS_siftDown(int i) {
 }
 
 void FeatureStore::HS_heapify() {
-    for (int i = HS_end/2; i < HS_end; i++) {
-        HS_siftUp(i);
+    for (int i = HS_end/2; i >= 0; i--) {
+        HS_siftDown(i);
     }
 }
 
@@ -156,8 +160,14 @@ void FeatureStore::HS_sort() {
     while (HS_end > 0) {
         HS_end--;
 
+        if (db[0].feature_id < db[1].feature_id || db[0].feature_id < db[2].feature_id) {
+            printf("big problem\n");
+        }
+
         HS_swap(0, HS_end);
 
         HS_siftDown(0);
     }
 }
+
+

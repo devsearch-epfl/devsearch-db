@@ -66,6 +66,12 @@ int StringDict::getKey(string text) {
     return current->key;
 }
 
+void StringDict::getBatchKeys(int size, string* texts, int* keysOut) {
+    for (int i = 0; i < size; ++i) {
+        keysOut[i] = getKey(texts[i]);
+    }
+}
+
 int StringDict::generateKey() {
     size++;
     return tempId++;

@@ -30,6 +30,8 @@ public:
 
     void sort();
 
+    db_feature* at(int pos);
+
     int HS_parent(int i);
 
     int HS_firstChild(int i);

@@ -46,6 +46,8 @@ public:
     void sort(int *translation);
 
     int sort(int *translation, trie_node *node, int idStart);
+
+    void getBatchKeys(int size, string *texts, int *keysOut);
 };
 
 
