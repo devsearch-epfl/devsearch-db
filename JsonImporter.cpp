@@ -12,7 +12,7 @@ using namespace std;
 
 
 //TODO: allow for space between objects
-const regex FEATURE_REGEX("\\{\"feature\":\"([^\"]+)\",\"file\":\"([^\"]+)\",\"line\":\\{\"\\$numberInt\":\"(\\d+)\"\\},\"repoRank\":([\\d\\.]+)\\}");
+const regex FEATURE_REGEX("\\{\"feature\":\"((?:[^\"]|\\\\\")+)\",\"file\":\"([^\"]+)\",\"line\":\\{\"\\$numberInt\":\"(\\d+)\"\\},\"repoRank\":([\\d\\.]+)\\}");
 
 JsonImporter::JsonImporter(string filename) {
 //    TODO: file does not exist + IOException
