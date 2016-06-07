@@ -11,7 +11,7 @@
 
 using namespace std;
 
-#define MAX_FEATURE_READ 27000000
+#define MAX_FEATURE_READ 10000
 
 int main() {
 

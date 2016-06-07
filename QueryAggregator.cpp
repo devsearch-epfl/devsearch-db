@@ -47,6 +47,11 @@ void QueryAggregator::finalize(int qLength, agg_result* out) {
     out->scoreBreakdown.emplace("size", .4 * sizeScore);
     out->scoreBreakdown.emplace("final", out->score);
 
+    out->lineEnd = endLine;
+    out->lineStart = startLine;
+
+    out->featureIDs.assign(featureSet.begin(), featureSet.end());
+
     out->fileId = fileId;
 
     out->lines = lines;

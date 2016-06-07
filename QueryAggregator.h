@@ -18,6 +18,9 @@ struct agg_result {
     double score;
     map<string, double> scoreBreakdown;
     vector<int> lines;
+    int lineStart;
+    int lineEnd;
+    vector<int> featureIDs;
 };
 
 
