@@ -3,6 +3,7 @@
 //
 
 #include "QueryProcessor.h"
+#include "QueryAggregator.h"
 #include <queue>
 using namespace std;
 
@@ -35,11 +36,13 @@ QueryProcessor::QueryProcessor(FeatureStore *str, FeatureIndex *idx) {
     index = idx;
 }
 
-void QueryProcessor::process(int qLength, int q[], int take, int from) {
+void QueryProcessor::process(int qLength, int q[], int take, int from, vector<agg_result>* out, int* matchedFeatures, int* matchedFiles) {
 
     std::priority_queue<pointer, std::vector<pointer>, LessThanByFileId> pointers;
+    max_heap_t bestResults;
 
-    int count = 0;
+    int totFeatureCount = 0;
+    int totFileCount = 0;
 
     // build pointers that will perform the query
     for (int i = 0; i < qLength; i++) {
@@ -61,25 +64,47 @@ void QueryProcessor::process(int qLength, int q[], int take, int from) {
 
     pointer currPointer;
     db_feature* currFeature;
+
+    QueryAggregator* aggregator = nullptr;
      
-    int readHead, currFileID;
+    int readHead;
+    int currFileID = -1;
 
     while (!pointers.top().exhausted) {
 
         currPointer = pointers.top();
-
-        currFileID = currPointer.currFileId;
         readHead = currPointer.currPos;
-
         currFeature = store->at(readHead);
 
+//        When we reach a new file we start a new aggregator
+        if (currFileID != currPointer.currFileId && aggregator) {
+
+            // TODO: finalize and append current aggregator
+            agg_result* agg = new agg_result();
+            aggregator->finalize(qLength, agg);
+
+            insertMaxHeap(agg, take+from, &bestResults);
+
+            delete aggregator;
+            aggregator = nullptr;
+
+        }
+
+        currFileID = currPointer.currFileId;
+
         while(currFeature->file_id == currFileID && currFeature->feature_id == currPointer.featureID) {
-            currFeature = store->at(readHead);
+
+            totFeatureCount+=1;
 
             // do something with store->at(readHead)
-            count+=1;
+            if (!aggregator) {
+                aggregator = new QueryAggregator(currFeature);
 
-//            printf("found feature: %d\t%d\t%d\t%f\n", currFeature->feature_id, currFeature->file_id, currFeature->line_nb, currFeature->reporank);
+                // means that we found a new file matching query
+                totFileCount ++;
+            } else {
+                aggregator->addFeature(currFeature);
+            }
 
             currFeature = store->at(++readHead);
         }
@@ -94,9 +119,50 @@ void QueryProcessor::process(int qLength, int q[], int take, int from) {
          });
     }
 
-    // do something with the returned result
-    printf("found %d element matching the query\n", count);
+    // add the final aggregation result
+    if (aggregator) {
+
+        agg_result* agg = new agg_result();
+        aggregator->finalize(qLength, agg);
+
+        insertMaxHeap(agg, take+from, &bestResults);
+
+        delete aggregator;
+        aggregator = nullptr;
+    }
+
+
+    // fill the output array with the list of best results
+    for (int j = 0; j < bestResults.size() - take; ++j) {
+        bestResults.pop();
+    }
+
+    while (!bestResults.empty()) {
+        out->emplace_back(*bestResults.top());
+        bestResults.pop();
+    }
+
+    // return the number of results
+    *matchedFeatures = totFeatureCount;
+    *matchedFiles = totFileCount;
 }
+
+void QueryProcessor::insertMaxHeap(agg_result *in, int maxSize, max_heap_t *maxHeap) {
+    if (maxHeap->size() < maxSize) {
+
+        maxHeap->push(in);
+
+    } else if (maxHeap->top()->score < in->score) {
+
+        // unallocate this aggregated result
+        delete maxHeap->top();
+        maxHeap->pop();
+
+        maxHeap->push(in);
+    }
+}
+
+
 
 
 

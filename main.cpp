@@ -11,7 +11,7 @@
 
 using namespace std;
 
-#define MAX_FEATURE_READ 27000000
+#define MAX_FEATURE_READ 10000
 
 int main() {
 
@@ -37,7 +37,7 @@ int main() {
 
         db->add(file_id, feature_id, reporank, lineNb);
 
-        if (count%100000 == 0) {
+        if (count%10000 == 0) {
             printf("processed %dK\n", count/1000);
             fflush(stdout);
         }
@@ -87,8 +87,23 @@ int main() {
     QueryProcessor* q = new QueryProcessor(db, db_index);
 
     const clock_t begin_query_time = clock();
-    q->process(qLength, keys, 10, 0);
+
+    int take = 10;
+    int from = 0;
+
+    vector<agg_result> finalResult;
+    int totalMachedFiles;
+    int totalMachedFeatures;
+
+    q->process(qLength, keys, 10, 0, &finalResult, &totalMachedFeatures, &totalMachedFiles);
+
     printf("DB queried in %f sec\n", float( clock () - begin_query_time ) /  CLOCKS_PER_SEC);
+
+    printf("Found %d features in %d files\n\n--- Best Results ---\n", totalMachedFeatures, totalMachedFiles);
+
+    for (vector<agg_result>::iterator it = finalResult.begin(); it != finalResult.end(); ++it) {
+        printf("score:%f\tfileId:%d", (*it).score, (*it).fileId);
+    }
 
 
     return 0;

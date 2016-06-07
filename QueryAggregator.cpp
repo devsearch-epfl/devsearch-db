@@ -10,6 +10,9 @@ QueryAggregator::QueryAggregator(db_feature* feature) {
 
     startLine = feature->line_nb;
     endLine = feature->line_nb;
+
+    featureSet.emplace(feature->feature_id);
+    lines.emplace_back(feature->line_nb);
 }
 
 void QueryAggregator::addFeature(db_feature* feature) {
@@ -37,12 +40,16 @@ void QueryAggregator::finalize(int qLength, agg_result* out) {
 
     out->score = .6 * densityScore + .4 * sizeScore /*+ .3 * rarityScore */+ .1 * ratioOfMatches + .4 * repoRank;
 
-    out->scoreBreakdown->emplace("repoRank", .4 * repoRank);
-    out->scoreBreakdown->emplace("ratioOfMatches", .1 * ratioOfMatches);
-    out->scoreBreakdown->emplace("rarity", 0.0);
-    out->scoreBreakdown->emplace("density", 0.0);
-    out->scoreBreakdown->emplace("size", .4 * sizeScore);
-    out->scoreBreakdown->emplace("final", out->score);
+    out->scoreBreakdown.emplace("repoRank", .4 * repoRank);
+    out->scoreBreakdown.emplace("ratioOfMatches", .1 * ratioOfMatches);
+    out->scoreBreakdown.emplace("rarity", 0.0);
+    out->scoreBreakdown.emplace("density", 0.0);
+    out->scoreBreakdown.emplace("size", .4 * sizeScore);
+    out->scoreBreakdown.emplace("final", out->score);
+
+    out->fileId = fileId;
+
+    out->lines = lines;
 }
 
 

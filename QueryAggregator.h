@@ -14,8 +14,9 @@
 using namespace std;
 
 struct agg_result {
+    int fileId;
     double score;
-    map<string, double>* scoreBreakdown;
+    map<string, double> scoreBreakdown;
     vector<int> lines;
 };
 
