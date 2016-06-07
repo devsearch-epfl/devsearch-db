@@ -6,6 +6,8 @@
 #include <fstream>
 #include <string>
 #include <regex>
+#include <math.h>
+
 using namespace std;
 
 #define MAX_BUFFER_LENGTH 1000
@@ -13,6 +15,7 @@ using namespace std;
 
 //TODO: allow for space between objects
 const regex FEATURE_REGEX("\\{\"feature\":\"((?:[^\"]|\\\\\")+)\",\"file\":\"([^\"]+)\",\"line\":\\{\"\\$numberInt\":\"(\\d+)\"\\},\"repoRank\":([\\d\\.]+)\\}");
+const float log25567 = log(25567);
 
 JsonImporter::JsonImporter(string filename) {
 //    TODO: file does not exist + IOException
@@ -53,7 +56,7 @@ bool JsonImporter::readFeature(string *feature, string *file, float *reporank, i
     *feature = matches.str(1);
     *file = matches.str(2);
     *line = stoi(matches.str(3));
-    *reporank = stof(matches.str(4));
+    *reporank = (float) log(stof(matches.str(4)) + 1) / log25567;
 
     return true;
 }

@@ -30,7 +30,7 @@ void QueryAggregator::addFeature(db_feature* feature) {
 
 void QueryAggregator::finalize(int qLength, agg_result* out) {
 
-    double ratioOfMatches = featureSet.size()/qLength;
+    double ratioOfMatches = featureSet.size() / (float) qLength;
     double sizeScore = lines.size();
 
     double densityScore = sizeScore / (endLine-startLine+1);
@@ -43,7 +43,7 @@ void QueryAggregator::finalize(int qLength, agg_result* out) {
     out->scoreBreakdown.emplace("repoRank", .4 * repoRank);
     out->scoreBreakdown.emplace("ratioOfMatches", .1 * ratioOfMatches);
     out->scoreBreakdown.emplace("rarity", 0.0);
-    out->scoreBreakdown.emplace("density", 0.0);
+    out->scoreBreakdown.emplace("density", densityScore);
     out->scoreBreakdown.emplace("size", .4 * sizeScore);
     out->scoreBreakdown.emplace("final", out->score);
 

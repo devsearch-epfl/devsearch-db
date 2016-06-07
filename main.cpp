@@ -11,7 +11,7 @@
 
 using namespace std;
 
-#define MAX_FEATURE_READ 10000
+#define MAX_FEATURE_READ 27000000
 
 int main() {
 
@@ -101,8 +101,13 @@ int main() {
 
     printf("Found %d features in %d files\n\n--- Best Results ---\n", totalMachedFeatures, totalMachedFiles);
 
-    for (vector<agg_result>::iterator it = finalResult.begin(); it != finalResult.end(); ++it) {
-        printf("score:%f\tfileId:%d", (*it).score, (*it).fileId);
+    for (vector<agg_result>::iterator it = finalResult.begin(); it != finalResult.end(); it++) {
+        printf("score:%f\tfileId:%d\t|", (*it).score, (*it).fileId);
+
+        for (map<string, double>::iterator mapIt = (*it).scoreBreakdown.begin(); mapIt != (*it).scoreBreakdown.end(); mapIt++) {
+            printf("\t%s=%f", mapIt->first.c_str(), mapIt->second);
+        }
+        cout << endl;
     }
 
 
